@@ -1,3 +1,4 @@
+import json
 import argparse
 from functools import partial
 
@@ -33,7 +34,7 @@ def compile_and_fit(model, train_ds, val_ds):
 def hpo_func(trial, n_layers, activations, n_units, units_step):
     mlflow.tensorflow.autolog()
 
-    with mlflow.start_run(experiment_id=EXPERIMENT, nested=True):
+    with mlflow.start_run(experiment_id=EXPERIMENT, nested=True, run_name='MLP Classifier'):
         n_layers = trial.suggest_int('n_layers', *n_layers)
         activation = trial.suggest_categorical('activation', choices=activations)
 
@@ -98,16 +99,20 @@ if __name__ == '__main__':
     args = parser.parse_args().__dict__
     print(args)
 
+    with open('databases_info.json', 'r') as json_file:
+        db_info = json.load(json_file)
+
     client = MlflowClient()
     try:
         EXPERIMENT = client.create_experiment(EXPERIMENT_NAME)
     except:
         EXPERIMENT = client.get_experiment_by_name(EXPERIMENT_NAME).experiment_id
 
-    with mlflow.start_run(experiment_id=EXPERIMENT, run_name=RUN_NAME):
+    with mlflow.start_run(experiment_id=EXPERIMENT, run_name=RUN_NAME) as run:
 
         mlflow.log_params(args)
-        study = optuna.create_study(study_name=EXPERIMENT_NAME, direction='maximize')
+        study_name = run.info.run_id
+        study = optuna.create_study(study_name=study_name, direction='maximize', storage=db_info['optuna'])
         objective = partial(hpo_func, **args)
         study.optimize(objective, n_trials=3)
 
