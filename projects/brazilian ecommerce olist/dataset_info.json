@@ -1,0 +1,5 @@
+{
+    "name": "Brazilian E-Commerce Public Dataset by Olist",
+    "local_db": "br_ecommerce",
+    "source": "https://www.kaggle.com/olistbr/brazilian-ecommerce"
+}
