@@ -5,7 +5,6 @@ import tensorflow as tf
 from tensorflow import keras
 from ..utils import makedir
 
-
 def build_model(model_name, layers_config):
 
     layers = dict()
@@ -35,3 +34,22 @@ def build_model(model_name, layers_config):
 
     model = keras.Model(model_inputs, model_outputs, name=model_name)
     return model
+
+class LayersConfigs(object):
+
+    def __init__(self, srcdir):
+
+        self.srcdir = srcdir
+        self.configs = {config_file[:-5]: None for config_file in os.listdir(srcdir)
+                                if config_file.endswith('.json')}
+    
+    def __getitem__(self, key):
+
+        if not key in self.configs.keys():
+            raise KeyError(f'There is no template for {key}')
+        
+        if self.configs[key] is None:
+            with open(os.path.join(self.srcdir, f'{key}.json'), 'r') as json_file:
+                self.configs[key] = json.load(json_file)
+        
+        return self.configs[key]

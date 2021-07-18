@@ -1,3 +1,7 @@
 .vscode/
 mlruns/
 databases_info.json
+datasets/
+mlflow_admin.ipynp
+packages/alexandria/secrets.py
+**__pycache__/
