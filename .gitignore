@@ -5,3 +5,4 @@ datasets/
 mlflow_admin.ipynp
 packages/alexandria/secrets.py
 **__pycache__/
+azure101/
